@@ -1,44 +1,41 @@
+app
+===
 
+**app** is a simple application loader for Erlang. This tool can be used to easily load and run Erlang applications on remote embedded hardware such as the Lumenosys Robotics [BMOD][1].
 
-#Simple Application Loader for the Lumenosys Obsidian boards#
-
-### Interface description ###
-
-### Dependencies ###
+Dependencies
+------------
 
 To build you will need a working installation of Erlang 17 (or
 later). <br/>
 Please refer to [Erlang/OTP](http://www.erlang.org) for information on building and installing Erlang/OTP.
 
-The demo_pub application is built using [rebar](https://github.com/rebar/rebar). Refer to [building rebar](https://github.com/rebar/rebar/wiki/Building-rebar) for information on building and using rebar.
+This application is built using [rebar](https://github.com/rebar/rebar). Refer to [building rebar](https://github.com/rebar/rebar/wiki/Building-rebar) for information on building and using rebar.
 
-### Downloading
+Downloading
+-----------
 
 ```sh
-$ git clone git://github.com/dbutter/app.git
+$ git clone git://github.com/lumenosys/app.git
 ```
-### Configuration
-#### Concepts
-...
-#### Files
-...
-### Building
+Building
+--------
 
 Compile:
 
 ```sh
 $ cd app
-$ rebar app
+$ rebar compile app
 ...
 ==> app (compile)
 ```
 
-### Usage example
-...
+Usage example
+-------------
+
 ```sh
-$ export ERL_LIBS=/path/to/app
-$ erl -sname obsidian@ion1 -boot start_sasl -eval "application:start(app)"
-...
+$ export ERL_LIBS=/path/to/myapp
+$ erl -sname master@local -setcookie lumenosys -boot start_sasl -eval "app:start(obsidian@bmod, myapp)"
 ```
 
-
+[1]: https://lumenosys.com/products
