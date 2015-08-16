@@ -1,10 +1,10 @@
 %%%-------------------------------------------------------------------
-%%% @author Devin Butterfield <dbutter@db>
-%%% @copyright (C) 2014, Devin Butterfield
+%%% @author Lumenosys Robotics <dbutter@lumenosys.com>
+%%% @copyright (C) 2014, Lumenosys Robotics
 %%% @doc
 %%%
 %%% @end
-%%% Created : 25 Aug 2014 by Devin Butterfield <dbutter@db>
+%%% Created : 25 Aug 2014 by Lumenosys Robotics <dbutter@lumenosys.com>
 %%%-------------------------------------------------------------------
 -module(app).
 
