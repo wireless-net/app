@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(app).
 
--export([load/2, unload/2, reload/2, start/2, stop/2, code_change/2]).
+-export([load/2, unload/2, reload/2, start/2, stop/2]).
 
 load_it(App) ->
     case application:load(App) of
@@ -80,10 +80,13 @@ load_appspecs(Node, [AppSpec|List]) ->
 	    io:format("failed: ~p~n", [Reply])
     end.
 
-%%%
-%%% Given an application name, find all application dependencies,
-%%% modules, and app spec files, and load all onto the remote node.
-%%% 
+%% @doc Given an application name, find all application dependencies,
+%% modules, and app spec files, and load all onto the remote node.
+%% @end
+-spec load(Node, Application) -> [atom()] | 'error' when
+	Node :: node(),
+	Application :: atom().
+
 load(Node, Application) ->
     %% first get list of all applications our app depends on
     AppsList = get_apps_list([Application], []) ++ [Application],
@@ -104,21 +107,29 @@ load(Node, Application) ->
 	    error
     end.
 
-%%%
-%%% Stop the specified application on the specified remote node.
-%%%
-%%% NOTE: this function only unloads the top level application, not
-%%% all dependencies!
-%%% 
+
+%% @doc Stop the specified application on the specified remote node.
+%%
+%% NOTE: this function only unloads the specified application, not
+%% all dependencies!
+%% @end
+-spec unload(Node, Application) -> 'ok' | {'error', Reason} when
+	Node :: node(),
+	Application :: atom(),
+	Reason :: term().
+
 unload(Node, Application) ->
     rpc:call(Node, application, unload, [Application]).
 
-%%
-%% Force a complete stop, unload, load, and start for the specified
+%% @doc Force a complete stop, unload, load, and start for the specified
 %% application. This is useful in situation where you need to change
 %% things which cannot be done by hot swapping, such as application
 %% environment parameters, etc.
-%%
+%% @end
+-spec reload(Node, Application) -> 'ok' | 'error' when
+	Node :: node(),
+	Application :: atom().
+
 reload(Node, Application) ->
     ok = stop(Node, Application),
     ok = unload(Node, Application),
@@ -135,34 +146,41 @@ start_apps(Node, [App|List]) ->
 	    start_apps(Node, List);
 	{error, {already_started, _}} ->
 	    io:format("already started~n"),
-	    start_apps(Node, List);
+	    start_apps(Node, List),
+	    error;
 	_ ->
-	    io:format("failed: ~p~n", [Reply])
+	    io:format("failed: ~p~n", [Reply]),
+	    error
     end.
 	    
 
+%% @doc Load and start the specified application onto the specified remote
+%% node.
+%% @end
+-spec start(Node, Application) -> 'ok' | 'error' when
+	Node :: node(),
+	Application :: atom().
 
-%%%
-%%% Load and start the specified application onto the specified remote
-%%% node.
-%%% 
 start(Node, Application) ->
     AppList = load(Node, Application),
     start_apps(Node, AppList).
 
 
-%%%
-%%% Stop the specified application on the specified remote node.
-%%% 
-%%% NOTE: this function only stops the top level application, not all
-%%% dependencies!
-%%% 
+%% @doc  Stop the specified application on the specified remote node.
+%% 
+%% NOTE: this function only stops the top level application, not all
+%% dependencies!
+%% @end
+-spec stop(Node, Application) -> 'ok' | {'error', Reason} when
+	Node :: node(),
+	Application :: atom(),
+	Reason :: term().
+
 stop(Node, Application) ->
     rpc:call(Node, application, stop, [Application]).
 
-%%%
-%%% Simple code_change command for applications which don't implement
+%%% @doc Simple code_change command for applications which don't implement
 %%% OTP behaviours
-%%%
-code_change(Node, Application) ->
-    rpc:call(Node, Application, code_change, []).
+%%% @end
+% code_change(Node, Application) ->
+%     rpc:call(Node, Application, code_change, []).
