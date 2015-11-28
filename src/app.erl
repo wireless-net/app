@@ -121,7 +121,7 @@ load(Node, Application) ->
 unload(Node, Application) ->
     rpc:call(Node, application, unload, [Application]).
 
-%% @doc Force a complete stop, unload, load, and start for the specified
+%% @doc Force a complete stop, unload, and load for the specified
 %% application. This is useful in situation where you need to change
 %% things which cannot be done by hot swapping, such as application
 %% environment parameters, etc.
@@ -131,9 +131,17 @@ unload(Node, Application) ->
 	Application :: atom().
 
 reload(Node, Application) ->
-    ok = stop(Node, Application),
+    ok = case stop(Node, Application) of
+             ok ->
+                 io:format(" ...app stopped~n"),
+                 ok;
+             {error,{not_started, Application}} ->
+                 io:format(" ...app not running~n"),
+                 ok
+             %% otherwise we crash here (something went wrong) 
+         end,
     ok = unload(Node, Application),
-    start(Node, Application).
+    load(Node, Application).
 
 start_apps(_Node, []) ->
     ok;
